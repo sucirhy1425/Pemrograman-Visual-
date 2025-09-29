@@ -1,0 +1,24 @@
+Module Module1
+    Sub Main()
+        Console.Write("Masukkan Nilai A : ")
+        Dim A As Integer = Console.ReadLine()
+
+        Console.Write("Masukkan Nilai B : ")
+        Dim B As Integer = Console.ReadLine()
+
+        ' Operasi dan pengecekan hasil negatif
+        Dim hasilTambah As Integer = A + B
+        Dim hasilKurang As Integer = A - B
+        Dim hasilKali As Integer = A * B
+        Dim hasilBagi As Double = A / B
+        Dim hasilMod As Integer = A Mod B
+
+        Console.WriteLine("Hasil A + B : " & If(hasilTambah < 0, 0, hasilTambah))
+        Console.WriteLine("Hasil A - B : " & If(hasilKurang < 0, 0, hasilKurang))
+        Console.WriteLine("Hasil A * B : " & If(hasilKali < 0, 0, hasilKali))
+        Console.WriteLine("Hasil A / B : " & If(hasilBagi < 0, 0, hasilBagi))
+        Console.WriteLine("Hasil A Mod B : " & If(hasilMod < 0, 0, hasilMod))
+
+        Console.ReadLine() ' Pause
+    End Sub
+End Module
