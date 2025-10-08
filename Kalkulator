@@ -33,4 +33,12 @@ Public Class Form1
         TextBox1.Text = TextBox1.Text + "8"
     End Sub
 
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
+        TextBox1.Text = TextBox1.Text + "9"
+    End Sub
+
+    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
+        TextBox1.Text = TextBox1.Text + "."
+    End Sub
+
 End Class
