@@ -1,0 +1,36 @@
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+
+Public Class Form1
+    Private Sub Botton5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        TextBox1.Text = TextBox1.Text + "1"
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        TextBox1.Text = TextBox1.Text + "2"
+    End Sub
+
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        TextBox1.Text = TextBox1.Text + "3"
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        TextBox1.Text = TextBox1.Text + "4"
+    End Sub
+
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        TextBox1.Text = TextBox1.Text + "5"
+    End Sub
+
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        TextBox1.Text = TextBox1.Text + "6"
+    End Sub
+
+    Private Sub Button13_Click(sender As Object, e As EventArgs) Handles Button13.Click
+        TextBox1.Text = TextBox1.Text + "7"
+    End Sub
+
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
+        TextBox1.Text = TextBox1.Text + "8"
+    End Sub
+
+End Class
