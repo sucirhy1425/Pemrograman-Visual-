@@ -1,39 +1,102 @@
-Public Class Form1
-    Dim nilai1 As Double = 0
-    Dim operasi As String = ""
-    Dim baruInput As Boolean = True
+Imports System.Globalization
 
-    '=== ANGKA 0-9 ===
-    Private Sub Angka_Click(sender As Object, e As EventArgs) Handles Button5.Click, Button6.Click, Button7.Click, Button9.Click, Button10.Click, Button11.Click, Button13.Click, Button14.Click, Button15.Click, Button16.Click
-        Dim tombol As Button = sender
-        If TextBox1.Text = "0" Or baruInput Then
-            TextBox1.Text = tombol.Text
-            baruInput = False
+Public Class Form1
+    Private nilai1 As Double = 0
+    Private operasi As String = ""
+    Private mulaiInput As Boolean = True
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Inisialisasi textbox
+        TextBox1.Text = "0"
+        TextBox1.ReadOnly = True
+        TextBox1.TextAlign = HorizontalAlignment.Right
+
+        ' Secara dinamis hubungkan event handler berdasarkan Text tombol.
+        For Each ctrl As Control In Me.Controls
+            If TypeOf ctrl Is Button Then
+                Dim btn As Button = CType(ctrl, Button)
+                Dim t As String = btn.Text.Trim()
+
+                ' Angka 0-9
+                If t.Length = 1 AndAlso Char.IsDigit(t(0)) Then
+                    AddHandler btn.Click, AddressOf DigitClick
+                ElseIf t = "." Then
+                    AddHandler btn.Click, AddressOf DotClick
+                ElseIf t = "+" OrElse t = "-" OrElse t.ToUpper() = "X" OrElse t = "*" OrElse t = "/" OrElse t = ":" OrElse t = "×" OrElse t = "÷" Then
+                    AddHandler btn.Click, AddressOf OperatorClick
+                ElseIf t = "=" Then
+                    AddHandler btn.Click, AddressOf EqualsClick
+                ElseIf t.ToUpper() = "C" Then
+                    AddHandler btn.Click, AddressOf ClearClick
+                ElseIf t = "←" OrElse t = "<" OrElse t.ToLower() = "back" Then
+                    AddHandler btn.Click, AddressOf BackspaceClick
+                ElseIf t = "+/-" OrElse t = "±" Then
+                    AddHandler btn.Click, AddressOf PlusMinusClick
+                End If
+            End If
+        Next
+    End Sub
+
+    ' Handler untuk tombol angka
+    Private Sub DigitClick(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)
+        Dim digit As String = btn.Text.Trim()
+
+        If mulaiInput OrElse TextBox1.Text = "0" Then
+            TextBox1.Text = digit
+            mulaiInput = False
         Else
-            TextBox1.Text &= tombol.Text
+            TextBox1.Text &= digit
         End If
     End Sub
 
-    '=== TITIK (.) ===
-    Private Sub Button17_Click(sender As Object, e As EventArgs) Handles Button17.Click
+    ' Handler untuk titik/desimal
+    Private Sub DotClick(sender As Object, e As EventArgs)
+        If mulaiInput Then
+            TextBox1.Text = "0."
+            mulaiInput = False
+            Return
+        End If
+
         If Not TextBox1.Text.Contains(".") Then
             TextBox1.Text &= "."
         End If
     End Sub
 
-    '=== OPERATOR + - * / ===
-    Private Sub Operator_Click(sender As Object, e As EventArgs) Handles Button4.Click, Button8.Click, Button12.Click, Button18.Click
-        Dim tombol As Button = sender
-        nilai1 = Val(TextBox1.Text)
-        operasi = tombol.Text
-        baruInput = True
+    ' Handler operator (+ - X /)
+    Private Sub OperatorClick(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)
+        Dim opText As String = btn.Text.Trim()
+
+        ' Parse nilai saat ini ke nilai1 (lebih aman)
+        Dim temp As Double
+        If Double.TryParse(TextBox1.Text, NumberStyles.Any, CultureInfo.InvariantCulture, temp) Then
+            nilai1 = temp
+        Else
+            nilai1 = 0
+        End If
+
+        ' Normalisasi operator (X -> *, ÷/ : -> /)
+        Select Case opText.ToUpper()
+            Case "X", "×"
+                operasi = "*"
+            Case ":", "÷"
+                operasi = "/"
+            Case Else
+                operasi = opText
+        End Select
+
+        mulaiInput = True
     End Sub
 
-    '=== TOMBOL SAMA DENGAN (=) ===
-    Private Sub Button19_Click(sender As Object, e As EventArgs) Handles Button19.Click
-        Dim nilai2 As Double = Val(TextBox1.Text)
-        Dim hasil As Double
+    ' Handler tombol =
+    Private Sub EqualsClick(sender As Object, e As EventArgs)
+        Dim nilai2 As Double
+        If Not Double.TryParse(TextBox1.Text, NumberStyles.Any, CultureInfo.InvariantCulture, nilai2) Then
+            nilai2 = 0
+        End If
 
+        Dim hasil As Double = 0
         Select Case operasi
             Case "+"
                 hasil = nilai1 + nilai2
@@ -42,37 +105,48 @@ Public Class Form1
             Case "*"
                 hasil = nilai1 * nilai2
             Case "/"
-                If nilai2 = 0 Then
-                    MessageBox.Show("Tidak bisa dibagi 0!")
-                    Exit Sub
-                Else
-                    hasil = nilai1 / nilai2
+                If Math.Abs(nilai2) < Double.Epsilon Then
+                    MessageBox.Show("Tidak bisa dibagi 0!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Return
                 End If
+                hasil = nilai1 / nilai2
+            Case Else
+                ' Jika belum ada operator, tampilkan nilai saat ini
+                hasil = nilai2
         End Select
 
-        TextBox1.Text = hasil.ToString()
-        baruInput = True
+        ' Format hasil: jika bilangan bulat jangan tampilkan .0
+        If Math.Abs(hasil - Math.Round(hasil)) < 0.0000001 Then
+            TextBox1.Text = CStr(Math.Round(hasil))
+        Else
+            TextBox1.Text = hasil.ToString(CultureInfo.InvariantCulture)
+        End If
+
+        ' Reset state
+        mulaiInput = True
+        operasi = ""
     End Sub
 
-    '=== TOMBOL CLEAR (C) ===
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    ' Clear (C)
+    Private Sub ClearClick(sender As Object, e As EventArgs)
         TextBox1.Text = "0"
         nilai1 = 0
         operasi = ""
-        baruInput = True
+        mulaiInput = True
     End Sub
 
-    '=== TOMBOL BACKSPACE (←) ===
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    ' Backspace (←)
+    Private Sub BackspaceClick(sender As Object, e As EventArgs)
         If TextBox1.Text.Length > 1 Then
             TextBox1.Text = TextBox1.Text.Substring(0, TextBox1.Text.Length - 1)
         Else
             TextBox1.Text = "0"
+            mulaiInput = True
         End If
     End Sub
 
-    '=== TOMBOL +/- (UBAH TANDA) ===
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+    ' Plus / Minus (ubah tanda)
+    Private Sub PlusMinusClick(sender As Object, e As EventArgs)
         If TextBox1.Text.StartsWith("-") Then
             TextBox1.Text = TextBox1.Text.Substring(1)
         ElseIf TextBox1.Text <> "0" Then
